@@ -1,3 +1,6 @@
 vendor/
 .env
 oci.log
+*.pem
+temp.txt
+oci_cache.json
