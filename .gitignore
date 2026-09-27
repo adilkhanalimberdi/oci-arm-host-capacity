@@ -4,3 +4,4 @@ oci.log
 *.pem
 temp.txt
 oci_cache.json
+too_many_requests_waiter.txt
