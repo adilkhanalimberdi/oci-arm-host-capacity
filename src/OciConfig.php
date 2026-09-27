@@ -26,6 +26,7 @@ class OciConfig
     public string $sourceDetails;
     public string $bootVolumeId;
     public string $bootVolumeSizeInGBs;
+    public bool $assignPublicIp = false;
 
     /**
      * @param string $region
@@ -117,6 +118,14 @@ class OciConfig
     public function setBootVolumeSizeInGBs(string $bootVolumeSizeInGBs): void
     {
         $this->bootVolumeSizeInGBs = $bootVolumeSizeInGBs;
+    }
+
+    /**
+     * @param bool $assignPublicIp
+     */
+    public function setAssignPublicIp(bool $assignPublicIp): void
+    {
+        $this->assignPublicIp = $assignPublicIp;
     }
 
     /**

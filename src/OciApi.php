@@ -54,6 +54,7 @@ class OciApi
         }
 
         $displayName = 'instance-' . date('Ymd-Hi');
+        $assignPublicIp = $config->assignPublicIp ? 'true' : 'false';
 
         $body = <<<EOD
 {
@@ -66,7 +67,7 @@ class OciApi
     "availabilityDomain": "$availabilityDomain",
     "sourceDetails": {$config->getSourceDetails()},
     "createVnicDetails": {
-        "assignPublicIp": false,
+        "assignPublicIp": $assignPublicIp,
         "subnetId": "{$config->subnetId}",
         "assignPrivateDnsRecord": true
     },

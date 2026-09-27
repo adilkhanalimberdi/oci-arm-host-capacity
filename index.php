@@ -45,6 +45,10 @@ if ($bootVolumeSizeInGBs) {
     $config->setBootVolumeId($bootVolumeId);
 }
 
+if (filter_var(getenv('OCI_ASSIGN_PUBLIC_IP'), FILTER_VALIDATE_BOOLEAN)) {
+    $config->setAssignPublicIp(true);
+}
+
 $api = new OciApi();
 if (getenv('CACHE_AVAILABILITY_DOMAINS')) {
     $api->setCache(new FileCache($config));

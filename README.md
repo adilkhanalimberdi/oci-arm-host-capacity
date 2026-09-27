@@ -165,6 +165,9 @@ OCI_MEMORY_IN_GBS=1
 OCI_AVAILABILITY_DOMAIN=FeVO:EU-FRANKFURT-1-AD-2
 ```
 
+Set `OCI_ASSIGN_PUBLIC_IP=1` to get an ephemeral public IPv4 address assigned on creation (subnet must be public), 
+so you can skip the manual [Assigning public IP address](#assigning-public-ip-address) step.
+
 If you don't have instances of selected shape at all, and need only one, leave the value of `OCI_MAX_INSTANCES=1`. 
 When you managed to launch one and need more (or 2 from scratch), set to `OCI_MAX_INSTANCES=2`. 
 
