@@ -9,6 +9,7 @@ require "{$pathPrefix}vendor/autoload.php";
 
 use Dotenv\Dotenv;
 use Hitrov\Exception\ApiCallException;
+use Hitrov\Exception\TooManyRequestsWaiterException;
 use Hitrov\FileCache;
 use Hitrov\OciApi;
 use Hitrov\OciConfig;
@@ -54,7 +55,13 @@ if (getenv('CACHE_AVAILABILITY_DOMAINS')) {
     $api->setCache(new FileCache($config));
 }
 if (getenv('TOO_MANY_REQUESTS_TIME_WAIT')) {
-    $api->setWaiter(new TooManyRequestsWaiter((int) getenv('TOO_MANY_REQUESTS_TIME_WAIT')));
+    $waiter = new TooManyRequestsWaiter((int) getenv('TOO_MANY_REQUESTS_TIME_WAIT'));
+    // don't make any API calls (ListInstances included) while waiting, so the rate limit can recover
+    if ($waiter->isConfigured() && $waiter->isTooEarly()) {
+        echo "TooManyRequests cooldown: will retry after {$waiter->secondsRemaining()} seconds\n";
+        return;
+    }
+    $api->setWaiter($waiter);
 }
 $notifier = (function (): \Hitrov\Interfaces\NotifierInterface {
     /*
@@ -97,6 +104,9 @@ foreach ($availabilityDomains as $availabilityDomainEntity) {
     $availabilityDomain = is_array($availabilityDomainEntity) ? $availabilityDomainEntity['name'] : $availabilityDomainEntity;
     try {
         $instanceDetails = $api->createInstance($config, $shape, getenv('OCI_SSH_PUBLIC_KEY'), $availabilityDomain);
+    } catch(TooManyRequestsWaiterException $e) {
+        echo "TooManyRequests: pausing for " . getenv('TOO_MANY_REQUESTS_TIME_WAIT') . " seconds\n";
+        return;
     } catch(ApiCallException $e) {
         $message = $e->getMessage();
         echo "$message\n";
