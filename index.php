@@ -100,7 +100,8 @@ if (!empty($config->availabilityDomains)) {
     $availabilityDomains = $api->getAvailabilityDomains($config);
 }
 
-foreach ($availabilityDomains as $availabilityDomainEntity) {
+$lastAvailabilityDomainIndex = count($availabilityDomains) - 1;
+foreach (array_values($availabilityDomains) as $index => $availabilityDomainEntity) {
     $availabilityDomain = is_array($availabilityDomainEntity) ? $availabilityDomainEntity['name'] : $availabilityDomainEntity;
     try {
         $instanceDetails = $api->createInstance($config, $shape, getenv('OCI_SSH_PUBLIC_KEY'), $availabilityDomain);
@@ -119,8 +120,10 @@ foreach ($availabilityDomains as $availabilityDomainEntity) {
             strpos($message, 'InternalError') !== false &&
             strpos($message, 'Out of host capacity') !== false
         ) {
-            // trying next availability domain
-            sleep(16);
+            // trying next availability domain (no need to wait after the last one)
+            if ($index < $lastAvailabilityDomainIndex) {
+                sleep(16);
+            }
             continue;
         }
 
